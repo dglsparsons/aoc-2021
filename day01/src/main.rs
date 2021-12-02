@@ -4,7 +4,7 @@ use std::fs;
 fn main() {
     let file = fs::read_to_string("./input.txt").expect("unable to read input file");
 
-    let measurements: Vec<usize> = file
+    let measurements: Vec<_> = file
         .lines()
         .map(|s| s.parse::<usize>().expect("couldn't parse number"))
         .collect();
