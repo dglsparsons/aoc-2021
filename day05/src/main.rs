@@ -1,6 +1,8 @@
 use std::cmp;
+use std::collections::HashMap;
 use std::{fs, str::FromStr};
 
+#[derive(Hash, Eq, PartialEq, Debug)]
 struct Coordinate {
     x: i64,
     y: i64,
@@ -18,32 +20,27 @@ impl FromStr for Coordinate {
 }
 
 fn part_one(lines: &[(Coordinate, Coordinate)]) {
-    let mut grid = vec![vec![0; 1000]; 1000];
+    let mut visited = HashMap::new();
 
     for (start, end) in lines.iter() {
         if start.x == end.x {
             (cmp::min(start.y, end.y)..=cmp::max(start.y, end.y)).for_each(|y| {
-                grid[start.x as usize][y as usize] += 1;
+                *visited.entry(Coordinate { x: start.x, y }).or_insert(0) += 1;
             });
         }
         if start.y == end.y {
             (cmp::min(start.x, end.x)..=cmp::max(start.x, end.x)).for_each(|x| {
-                grid[x as usize][start.y as usize] += 1;
+                *visited.entry(Coordinate { x, y: start.y }).or_insert(0) += 1;
             });
         }
     }
 
-    let count = grid
-        .iter()
-        .flat_map(|row| row.iter())
-        .filter(|&x| x >= &2)
-        .count();
-
+    let count = visited.values().filter(|&x| *x >= 2).count();
     println!("part one - {}", count);
 }
 
 fn part_two(lines: &[(Coordinate, Coordinate)]) {
-    let mut grid = vec![vec![0; 1000]; 1000];
+    let mut visited = HashMap::new();
 
     for (start, end) in lines.iter() {
         let dx = end.x - start.x;
@@ -54,7 +51,7 @@ fn part_two(lines: &[(Coordinate, Coordinate)]) {
         let mut x = start.x;
         let mut y = start.y;
         loop {
-            grid[y as usize][x as usize] += 1;
+            *visited.entry(Coordinate { x, y }).or_insert(0) += 1;
             if x == end.x && y == end.y {
                 break;
             }
@@ -62,12 +59,7 @@ fn part_two(lines: &[(Coordinate, Coordinate)]) {
             y += dy;
         }
     }
-    let count = grid
-        .iter()
-        .flat_map(|row| row.iter())
-        .filter(|&x| x >= &2)
-        .count();
-
+    let count = visited.values().filter(|&x| *x >= 2).count();
     println!("part two - {}", count);
 }
 
